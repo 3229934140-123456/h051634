@@ -1,0 +1,46 @@
+{
+  "job_id": "cb5f252fb4fe",
+  "name": "restart-recovery-demo",
+  "state": "RUNNING",
+  "num_map_tasks": 12,
+  "num_reduce_tasks": 2,
+  "output_format": "text",
+  "start_time": 1781640448.2296815,
+  "end_time": null,
+  "accepted_logical_tasks": [
+    "cb5f252fb4fe-m-0",
+    "cb5f252fb4fe-m-2",
+    "cb5f252fb4fe-m-3",
+    "cb5f252fb4fe-m-1"
+  ],
+  "map_outputs": {
+    "worker-1": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-1",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-3"
+    ],
+    "worker-0": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-0",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-2"
+    ]
+  },
+  "map_partition_files": {
+    "cb5f252fb4fe-m-1": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-1\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-1\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-0": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-0\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-0\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-2": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-2\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-2\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-3": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-3\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-3\\part-0.pickle"
+    }
+  },
+  "num_recoveries": 0,
+  "saved_at": 1781640449.3322778
+}

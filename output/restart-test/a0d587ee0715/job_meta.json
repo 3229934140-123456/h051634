@@ -1,0 +1,54 @@
+{
+  "job_id": "a0d587ee0715",
+  "name": "restart-recovery-demo",
+  "state": "SUCCEEDED",
+  "num_map_tasks": 5,
+  "num_reduce_tasks": 2,
+  "output_format": "text",
+  "start_time": 1781638612.5920093,
+  "end_time": 1781638612.9025438,
+  "accepted_logical_tasks": [
+    "a0d587ee0715-r-0",
+    "a0d587ee0715-m-4",
+    "a0d587ee0715-m-1",
+    "a0d587ee0715-m-2",
+    "a0d587ee0715-r-1",
+    "a0d587ee0715-m-0",
+    "a0d587ee0715-m-3"
+  ],
+  "map_outputs": {
+    "worker-0": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-0",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-2",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-4"
+    ],
+    "worker-1": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-1",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-3"
+    ]
+  },
+  "map_partition_files": {
+    "a0d587ee0715-m-0": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-0\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-0\\part-0.pickle"
+    },
+    "a0d587ee0715-m-1": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-1\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-1\\part-0.pickle"
+    },
+    "a0d587ee0715-m-2": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-2\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-2\\part-0.pickle"
+    },
+    "a0d587ee0715-m-3": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-3\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-3\\part-0.pickle"
+    },
+    "a0d587ee0715-m-4": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-4\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-test\\a0d587ee0715\\map-outputs\\a0d587ee0715-m-4\\part-0.pickle"
+    }
+  },
+  "num_recoveries": 1,
+  "saved_at": 1781638614.4991913
+}

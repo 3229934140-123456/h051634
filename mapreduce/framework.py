@@ -11,26 +11,31 @@ from .scheduler import TaskScheduler
 from .worker import Worker
 from .shuffle import ShuffleManager, read_input_files
 from .fault_tolerance import FaultToleranceManager
+from .metadata import JobMetadataStore
 
 
 class MapReduceFramework:
     def __init__(self, output_dir: str = "./output", num_workers: int = 3):
         self.output_dir = output_dir
-        self.job_tracker = JobTracker()
+        os.makedirs(output_dir, exist_ok=True)
+
+        self.job_tracker = JobTracker(base_output_dir=output_dir)
         self.shuffle_manager = ShuffleManager(output_dir)
+        self.metadata_store = JobMetadataStore(output_dir)
+
         self.workers: Dict[str, Worker] = {}
         self.worker_statuses: Dict[str, WorkerStatus] = {}
         self.scheduler = TaskScheduler(self.job_tracker, self.worker_statuses)
         self.fault_tolerance = FaultToleranceManager(
             self.job_tracker, self.scheduler, self.worker_statuses
         )
+
         self._running = False
         self._scheduler_thread: Optional[threading.Thread] = None
         self._heartbeat_thread: Optional[threading.Thread] = None
+        self._persist_thread: Optional[threading.Thread] = None
         self._status_monitor_thread: Optional[threading.Thread] = None
         self._status_callbacks: Dict[str, Callable] = {}
-
-        os.makedirs(output_dir, exist_ok=True)
 
         for i in range(num_workers):
             self.add_worker(f"worker-{i}")
@@ -62,6 +67,9 @@ class MapReduceFramework:
         self._heartbeat_thread = threading.Thread(target=self._heartbeat_loop, daemon=True)
         self._heartbeat_thread.start()
 
+        self._persist_thread = threading.Thread(target=self._persist_loop, daemon=True)
+        self._persist_thread.start()
+
         if monitor_status:
             self._status_monitor_thread = threading.Thread(target=self._status_monitor_loop, daemon=True)
             self._status_monitor_thread.start()
@@ -75,6 +83,8 @@ class MapReduceFramework:
             self._scheduler_thread.join(timeout=2.0)
         if self._heartbeat_thread:
             self._heartbeat_thread.join(timeout=2.0)
+        if self._persist_thread:
+            self._persist_thread.join(timeout=2.0)
         if self._status_monitor_thread:
             self._status_monitor_thread.join(timeout=2.0)
 
@@ -141,12 +151,14 @@ class MapReduceFramework:
                 output_path = self._run_reduce_task(task, job)
 
             self.scheduler.complete_task(job.job_id, task.task_id, output_path)
+            self.job_tracker.save_job(job.job_id)
 
             self._cleanup_speculative_tasks(task, job)
 
         except Exception as e:
             print(f"[Framework] Task {task.task_id} failed: {e}")
             self.scheduler.fail_task(job.job_id, task.task_id)
+            self.job_tracker.save_job(job.job_id)
 
         finally:
             if task.task_id in worker.status.running_tasks:
@@ -172,6 +184,8 @@ class MapReduceFramework:
             job.job_id, task.task_id, map_output, job.num_reduce_tasks
         )
 
+        job.map_partition_files[task.task_id] = output_files
+
         first_path = list(output_files.values())[0] if output_files else ""
         task.output_path = first_path
         return first_path
@@ -184,6 +198,15 @@ class MapReduceFramework:
         shuffled_data = self.shuffle_manager.get_partition_inputs(
             job.job_id, task.partition_id, accepted_map_ids
         )
+
+        fetched_files = []
+        base_dir = os.path.join(self.output_dir, job.job_id, "map-outputs")
+        for map_id in accepted_map_ids:
+            part_file = os.path.join(base_dir, map_id, f"part-{task.partition_id}.pickle")
+            if os.path.exists(part_file):
+                fetched_files.append(part_file)
+
+        setattr(task, "fetched_map_files", fetched_files)
 
         sorted_data = sorted(shuffled_data, key=lambda x: str(x[0]))
 
@@ -231,6 +254,14 @@ class MapReduceFramework:
                 if worker.status.is_alive:
                     worker.heartbeat()
             time.sleep(1.0)
+
+    def _persist_loop(self):
+        while self._running:
+            for job_id in self.job_tracker.job_queue:
+                job = self.job_tracker.get_job(job_id)
+                if job and job.state in (JobState.RUNNING, JobState.MAP_COMPLETED):
+                    job.save_metadata()
+            time.sleep(2.0)
 
     def _status_monitor_loop(self):
         while self._running:
@@ -293,6 +324,38 @@ class MapReduceFramework:
             output_format=output_format
         )
 
+    def resume_job(
+        self,
+        job_id: str,
+        map_func: Callable,
+        reduce_func: Callable,
+        input_data: Optional[List[Any]] = None
+    ) -> Optional[str]:
+        """恢复一个已存在的作业运行"""
+        if not self.metadata_store.job_exists(job_id):
+            return None
+
+        job_id = self.job_tracker.resume_job(
+            job_id=job_id,
+            map_func=map_func,
+            reduce_func=reduce_func,
+            input_data=input_data,
+            output_dir=self.output_dir
+        )
+        return job_id
+
+    def resume_job_from_files(
+        self,
+        job_id: str,
+        input_dir: str,
+        map_func: Callable,
+        reduce_func: Callable,
+        split_by: str = "lines",
+        chunk_size: int = 100
+    ) -> Optional[str]:
+        input_data = read_input_files(input_dir, split_by, chunk_size)
+        return self.resume_job(job_id, map_func, reduce_func, input_data)
+
     def get_job_status(self, job_id: str) -> Dict:
         return self.job_tracker.get_job_status(job_id)
 
@@ -330,7 +393,24 @@ class MapReduceFramework:
         job = self.job_tracker.get_job(job_id)
         if not job:
             return []
-        return self.shuffle_manager.get_final_results(job_id, job.num_reduce_tasks)
+
+        accepted_reduce_ids = [t.task_id for t in job.reduce_tasks if t.result_accepted]
+
+        all_results = []
+        reduce_dir = os.path.join(self.output_dir, job_id, "reduce-outputs")
+
+        for task_id in accepted_reduce_ids:
+            file_path = os.path.join(reduce_dir, f"{task_id}.pickle")
+            if os.path.exists(file_path):
+                try:
+                    import pickle
+                    with open(file_path, "rb") as f:
+                        results = pickle.load(f)
+                        all_results.extend(results)
+                except Exception:
+                    pass
+
+        return sorted(all_results, key=lambda x: str(x[0]))
 
     def get_job_report(self, job_id: str) -> Optional[JobReport]:
         return self.job_tracker.get_job_report(job_id)
@@ -348,11 +428,24 @@ class MapReduceFramework:
         report = self.get_job_report(job_id)
         if report:
             report.save(job.output_dir)
+            job.save_metadata()
 
         return output_path
 
     def list_jobs(self) -> List[Dict]:
         return self.job_tracker.list_jobs()
+
+    def list_history_jobs(self) -> List[Dict]:
+        """列出所有历史作业（包括磁盘上的）"""
+        return self.metadata_store.list_jobs()
+
+    def get_history_job_report(self, job_id: str) -> Optional[Dict]:
+        """获取历史作业报告"""
+        return self.metadata_store.load_job_report(job_id)
+
+    def get_history_job_result_path(self, job_id: str, output_format: str = "text") -> Optional[str]:
+        """获取历史作业结果文件路径"""
+        return self.metadata_store.get_job_result_path(job_id, output_format)
 
     def kill_job(self, job_id: str) -> bool:
         job = self.job_tracker.get_job(job_id)
@@ -380,3 +473,19 @@ class MapReduceFramework:
         report = self.get_job_report(job_id)
         if report:
             report.pretty_print()
+
+    def print_history_job_report(self, job_id: str):
+        report_data = self.metadata_store.load_job_report(job_id)
+        if report_data:
+            report = JobReport(job_id, report_data.get("name", ""))
+            report.load(report_data)
+            report.pretty_print()
+        else:
+            print(f"未找到作业 {job_id} 的报告")
+
+    def simulate_worker_failure(self, worker_id: str):
+        """模拟 worker 失败，用于测试容错"""
+        if worker_id in self.workers:
+            worker = self.workers[worker_id]
+            worker.status.last_heartbeat = time.time() - 100
+            self.fault_tolerance.check_worker_heartbeats()

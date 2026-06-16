@@ -124,7 +124,14 @@ class Worker:
 
         accepted_map_ids = [t.task_id for t in job.map_tasks if t.result_accepted]
 
+        fetched_files = []
         if self.shuffle_manager:
+            base_dir = os.path.join(self.shuffle_manager.base_output_dir, job.job_id, "map-outputs")
+            for map_id in accepted_map_ids:
+                part_file = os.path.join(base_dir, map_id, f"part-{task.partition_id}.pickle")
+                if os.path.exists(part_file):
+                    fetched_files.append(part_file)
+
             shuffled_data = self.shuffle_manager.get_partition_inputs(
                 job.job_id,
                 task.partition_id,
@@ -132,6 +139,8 @@ class Worker:
             )
         else:
             shuffled_data = []
+
+        setattr(task, "fetched_map_files", fetched_files)
 
         sorted_data = sorted(shuffled_data, key=lambda x: str(x[0]))
         grouped = group_by_key(sorted_data)

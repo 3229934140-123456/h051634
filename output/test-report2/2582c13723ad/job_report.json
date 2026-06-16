@@ -1,0 +1,157 @@
+{
+  "job_id": "2582c13723ad",
+  "name": "wordcount",
+  "final_state": "SUCCEEDED",
+  "start_time": 1781640409.365365,
+  "end_time": 1781640409.4711294,
+  "total_duration": 0.10576438903808594,
+  "final_output_path": "output/test-report2\\2582c13723ad\\result.text",
+  "recovery_stats": {
+    "num_recoveries": 0,
+    "reused_map_outputs": 0,
+    "reused_reduce_outputs": 0,
+    "rerun_map_tasks": 0,
+    "rerun_reduce_tasks": 0
+  },
+  "map_tasks": [
+    {
+      "task_id": "2582c13723ad-m-0",
+      "logical_task_id": "2582c13723ad-m-0",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781640409.3665833,
+      "end_time": 1781640409.3679762,
+      "duration": 0.0013928413391113281,
+      "output_path": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-0\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-0",
+        "start_idx": 0,
+        "length": 2,
+        "num_records": 2
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-0\\part-0.pickle",
+        "1": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-0\\part-1.pickle"
+      },
+      "fetched_map_files": []
+    },
+    {
+      "task_id": "2582c13723ad-m-1",
+      "logical_task_id": "2582c13723ad-m-1",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781640409.367042,
+      "end_time": 1781640409.368291,
+      "duration": 0.0012488365173339844,
+      "output_path": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-1\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-1",
+        "start_idx": 2,
+        "length": 2,
+        "num_records": 2
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-1\\part-0.pickle",
+        "1": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-1\\part-1.pickle"
+      },
+      "fetched_map_files": []
+    },
+    {
+      "task_id": "2582c13723ad-m-2",
+      "logical_task_id": "2582c13723ad-m-2",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-2",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781640409.3673697,
+      "end_time": 1781640409.3688252,
+      "duration": 0.001455545425415039,
+      "output_path": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-2\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-2",
+        "start_idx": 4,
+        "length": 4,
+        "num_records": 4
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-2\\part-0.pickle",
+        "1": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-2\\part-1.pickle"
+      },
+      "fetched_map_files": []
+    }
+  ],
+  "reduce_tasks": [
+    {
+      "task_id": "2582c13723ad-r-0",
+      "logical_task_id": "2582c13723ad-r-0",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781640409.468113,
+      "end_time": 1781640409.4699655,
+      "duration": 0.0018525123596191406,
+      "output_path": "output/test-report2\\2582c13723ad\\reduce-outputs\\2582c13723ad-r-0.pickle",
+      "input_split": null,
+      "partition_id": 0,
+      "partition_files": {},
+      "fetched_map_files": [
+        "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-0\\part-0.pickle",
+        "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-1\\part-0.pickle",
+        "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-2\\part-0.pickle"
+      ]
+    },
+    {
+      "task_id": "2582c13723ad-r-1",
+      "logical_task_id": "2582c13723ad-r-1",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781640409.4683783,
+      "end_time": 1781640409.4701877,
+      "duration": 0.0018093585968017578,
+      "output_path": "output/test-report2\\2582c13723ad\\reduce-outputs\\2582c13723ad-r-1.pickle",
+      "input_split": null,
+      "partition_id": 1,
+      "partition_files": {},
+      "fetched_map_files": [
+        "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-0\\part-1.pickle",
+        "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-1\\part-1.pickle",
+        "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-2\\part-1.pickle"
+      ]
+    }
+  ],
+  "summary": {
+    "total_map_tasks": 3,
+    "total_reduce_tasks": 2,
+    "accepted_map_results": 3,
+    "accepted_reduce_results": 2,
+    "failed_attempts": 0,
+    "speculative_attempts": 0,
+    "reused_map_outputs": 0,
+    "reused_reduce_outputs": 0
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "job_id": "cb5f252fb4fe",
+  "name": "restart-recovery-demo",
+  "state": "SUCCEEDED",
+  "num_map_tasks": 12,
+  "num_reduce_tasks": 2,
+  "output_format": "text",
+  "start_time": 1781640448.2296815,
+  "end_time": 1781640452.5581443,
+  "accepted_logical_tasks": [
+    "cb5f252fb4fe-m-8",
+    "cb5f252fb4fe-r-0",
+    "cb5f252fb4fe-m-0",
+    "cb5f252fb4fe-m-9",
+    "cb5f252fb4fe-m-10",
+    "cb5f252fb4fe-m-4",
+    "cb5f252fb4fe-m-1",
+    "cb5f252fb4fe-r-1",
+    "cb5f252fb4fe-m-11",
+    "cb5f252fb4fe-m-7",
+    "cb5f252fb4fe-m-2",
+    "cb5f252fb4fe-m-5",
+    "cb5f252fb4fe-m-6",
+    "cb5f252fb4fe-m-3"
+  ],
+  "map_outputs": {
+    "worker-1": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-1",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-3",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-5",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-7",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-9",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-11"
+    ],
+    "worker-0": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-0",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-2",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-4",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-6",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-8",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-10"
+    ]
+  },
+  "map_partition_files": {
+    "cb5f252fb4fe-m-1": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-1\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-1\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-0": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-0\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-0\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-2": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-2\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-2\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-3": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-3\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-3\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-4": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-4\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-4\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-5": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-5\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-5\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-7": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-7\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-7\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-6": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-6\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-6\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-8": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-8\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-8\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-9": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-9\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-9\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-10": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-10\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-10\\part-0.pickle"
+    },
+    "cb5f252fb4fe-m-11": {
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-11\\part-1.pickle",
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\restart-demo\\cb5f252fb4fe\\map-outputs\\cb5f252fb4fe-m-11\\part-0.pickle"
+    }
+  },
+  "num_recoveries": 1,
+  "saved_at": 1781640452.8607047
+}

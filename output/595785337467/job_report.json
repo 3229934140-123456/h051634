@@ -1,0 +1,95 @@
+{
+  "job_id": "595785337467",
+  "name": "wordcount",
+  "final_state": "SUCCEEDED",
+  "start_time": 1781638573.2942092,
+  "end_time": 1781638573.3992114,
+  "total_duration": 0.10500216484069824,
+  "final_output_path": "./output\\595785337467\\result.text",
+  "recovery_stats": {
+    "num_recoveries": 0,
+    "reused_map_outputs": 0,
+    "reused_reduce_outputs": 0,
+    "rerun_map_tasks": 0,
+    "rerun_reduce_tasks": 0
+  },
+  "map_tasks": [
+    {
+      "task_id": "595785337467-m-0",
+      "logical_task_id": "595785337467-m-0",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781638573.2954586,
+      "end_time": 1781638573.2967048,
+      "duration": 0.0012462139129638672,
+      "output_path": "./output\\595785337467\\map-outputs\\595785337467-m-0\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-0",
+        "start_idx": 0,
+        "length": 8,
+        "num_records": 8
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "./output\\595785337467\\map-outputs\\595785337467-m-0\\part-0.pickle",
+        "1": "./output\\595785337467\\map-outputs\\595785337467-m-0\\part-1.pickle"
+      },
+      "fetched_map_files": []
+    }
+  ],
+  "reduce_tasks": [
+    {
+      "task_id": "595785337467-r-0",
+      "logical_task_id": "595785337467-r-0",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781638573.3969314,
+      "end_time": 1781638573.398121,
+      "duration": 0.0011897087097167969,
+      "output_path": "./output\\595785337467\\reduce-outputs\\595785337467-r-0.pickle",
+      "input_split": null,
+      "partition_id": 0,
+      "partition_files": {},
+      "fetched_map_files": []
+    },
+    {
+      "task_id": "595785337467-r-1",
+      "logical_task_id": "595785337467-r-1",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781638573.3971343,
+      "end_time": 1781638573.3983037,
+      "duration": 0.001169443130493164,
+      "output_path": "./output\\595785337467\\reduce-outputs\\595785337467-r-1.pickle",
+      "input_split": null,
+      "partition_id": 1,
+      "partition_files": {},
+      "fetched_map_files": []
+    }
+  ],
+  "summary": {
+    "total_map_tasks": 1,
+    "total_reduce_tasks": 2,
+    "accepted_map_results": 1,
+    "accepted_reduce_results": 2,
+    "failed_attempts": 0,
+    "speculative_attempts": 0,
+    "reused_map_outputs": 0,
+    "reused_reduce_outputs": 0
+  }
+}

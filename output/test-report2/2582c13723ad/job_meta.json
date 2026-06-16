@@ -1,0 +1,44 @@
+{
+  "job_id": "2582c13723ad",
+  "name": "wordcount",
+  "state": "SUCCEEDED",
+  "num_map_tasks": 3,
+  "num_reduce_tasks": 2,
+  "output_format": "text",
+  "start_time": 1781640409.365365,
+  "end_time": 1781640409.4711294,
+  "accepted_logical_tasks": [
+    "2582c13723ad-r-0",
+    "2582c13723ad-m-0",
+    "2582c13723ad-m-2",
+    "2582c13723ad-r-1",
+    "2582c13723ad-m-1"
+  ],
+  "map_outputs": {
+    "worker-0": [
+      "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-0"
+    ],
+    "worker-1": [
+      "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-1"
+    ],
+    "worker-2": [
+      "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-2"
+    ]
+  },
+  "map_partition_files": {
+    "2582c13723ad-m-0": {
+      "0": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-0\\part-0.pickle",
+      "1": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-0\\part-1.pickle"
+    },
+    "2582c13723ad-m-1": {
+      "0": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-1\\part-0.pickle",
+      "1": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-1\\part-1.pickle"
+    },
+    "2582c13723ad-m-2": {
+      "0": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-2\\part-0.pickle",
+      "1": "output/test-report2\\2582c13723ad\\map-outputs\\2582c13723ad-m-2\\part-1.pickle"
+    }
+  },
+  "num_recoveries": 0,
+  "saved_at": 1781640409.5720453
+}

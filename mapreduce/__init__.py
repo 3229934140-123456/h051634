@@ -12,6 +12,7 @@ from .shuffle import (
 )
 from .fault_tolerance import FaultToleranceManager
 from .framework import MapReduceFramework
+from .metadata import JobMetadataStore
 
 __all__ = [
     "JobState", "TaskState", "TaskType", "Task",
@@ -23,5 +24,6 @@ __all__ = [
     "sort_partition", "group_by_key", "merge_sorted_lists",
     "read_input_files", "write_final_output",
     "FaultToleranceManager",
-    "MapReduceFramework"
+    "MapReduceFramework",
+    "JobMetadataStore"
 ]

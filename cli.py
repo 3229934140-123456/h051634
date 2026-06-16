@@ -3,17 +3,20 @@
 精简版 MapReduce 框架命令行入口
 
 使用示例:
-  # 启动本地集群并运行词频统计
-  python cli.py run --input test_data/wordcount_input --output output --job wordcount
+  # 运行词频统计
+  python cli.py run --input test_data/wordcount_input --job wordcount
 
-  # 查看集群状态
-  python cli.py status
+  # 列出所有历史作业
+  python cli.py history
 
   # 查看作业报告
   python cli.py report <job_id>
 
-  # 列出所有作业
-  python cli.py list
+  # 恢复作业
+  python cli.py resume --job-id <job_id> --input test_data/wordcount_input
+
+  # 失败恢复演示
+  python cli.py demo-recovery
 """
 
 import sys
@@ -45,11 +48,20 @@ BUILTIN_JOBS = {
 }
 
 
+def _get_job_config(job_name):
+    config = BUILTIN_JOBS.get(job_name)
+    if not config:
+        print(f"❌ 未知作业类型: {job_name}")
+        print(f"可用作业: {', '.join(BUILTIN_JOBS.keys())}")
+        return None
+    return config
+
+
 def cmd_run(args):
     """运行 MapReduce 作业"""
-    print("=" * 60)
+    print("=" * 70)
     print("🚀 启动精简版 MapReduce 集群")
-    print("=" * 60)
+    print("=" * 70)
 
     framework = MapReduceFramework(
         output_dir=args.output,
@@ -58,18 +70,14 @@ def cmd_run(args):
 
     print(f"\n📋 集群配置:")
     print(f"  工作节点数: {args.num_workers}")
-    print(f"  每个节点 Map 槽位: 2")
-    print(f"  每个节点 Reduce 槽位: 2")
     print(f"  输出目录: {args.output}")
 
     framework.start()
     print("\n✅ 集群启动成功")
 
     try:
-        job_config = BUILTIN_JOBS.get(args.job)
+        job_config = _get_job_config(args.job)
         if not job_config:
-            print(f"\n❌ 未知作业类型: {args.job}")
-            print(f"可用作业: {', '.join(BUILTIN_JOBS.keys())}")
             return 1
 
         print(f"\n📦 提交作业: {args.job}")
@@ -79,8 +87,6 @@ def cmd_run(args):
         print(f"  Reduce 任务数: {args.num_reduces}")
         print(f"  输出格式: {args.format}")
         print(f"  切分方式: {args.split_by}")
-        if args.split_by in ("lines", "size"):
-            print(f"  分片大小: {args.chunk_size}")
 
         if not os.path.exists(args.input):
             print(f"\n❌ 输入路径不存在: {args.input}")
@@ -118,7 +124,7 @@ def cmd_run(args):
 
             if args.show_results:
                 print(f"\n📋 结果预览 (前 {min(10, len(results))} 条):")
-                print("-" * 40)
+                print("-" * 50)
                 for key, value in results[:10]:
                     print(f"  {key}\t{value}")
                 if len(results) > 10:
@@ -127,16 +133,10 @@ def cmd_run(args):
             if args.show_report:
                 framework.print_job_report(job_id)
 
-            print(f"\n📁 输出目录结构: {os.path.join(args.output, job_id)}")
-            for root, dirs, files in os.walk(os.path.join(args.output, job_id)):
-                level = root.replace(os.path.join(args.output, job_id), '').count(os.sep)
-                indent = ' ' * 2 * level
-                print(f'{indent}{os.path.basename(root)}/')
-                subindent = ' ' * 2 * (level + 1)
-                for file in files:
-                    filepath = os.path.join(root, file)
-                    size = os.path.getsize(filepath)
-                    print(f'{subindent}{file} ({size} bytes)')
+            if args.show_files:
+                job_dir = os.path.join(args.output, job_id)
+                print(f"\n📁 输出目录结构: {job_dir}")
+                _print_dir_tree(job_dir)
 
             return 0
         else:
@@ -152,6 +152,143 @@ def cmd_run(args):
         print("\n🛑 正在停止集群...")
         framework.stop()
         print("✅ 集群已停止")
+
+
+def cmd_resume(args):
+    """恢复一个已存在的作业"""
+    print("=" * 70)
+    print("🔄 恢复作业运行")
+    print("=" * 70)
+
+    framework = MapReduceFramework(
+        output_dir=args.output,
+        num_workers=args.num_workers
+    )
+
+    if not framework.metadata_store.job_exists(args.job_id):
+        print(f"\n❌ 作业不存在: {args.job_id}")
+        return 1
+
+    framework.start()
+
+    try:
+        job_config = _get_job_config(args.job)
+        if not job_config:
+            return 1
+
+        print(f"\n📦 恢复作业: {args.job_id}")
+        print(f"  输入路径: {args.input}")
+
+        input_data = None
+        if args.input:
+            if not os.path.exists(args.input):
+                print(f"❌ 输入路径不存在: {args.input}")
+                return 1
+            from mapreduce.shuffle import read_input_files
+            input_data = read_input_files(args.input, args.split_by, args.chunk_size)
+
+        restored_job_id = framework.resume_job(
+            job_id=args.job_id,
+            map_func=job_config["map"],
+            reduce_func=job_config["reduce"],
+            input_data=input_data
+        )
+
+        if not restored_job_id:
+            print("❌ 恢复失败!")
+            return 1
+
+        job = framework.job_tracker.get_job(restored_job_id)
+        if job:
+            print(f"  当前状态: {job.state.value}")
+            print(f"  恢复次数: {job.num_recoveries}")
+            print(f"  已完成 Map: {job.completed_map_tasks}/{job.num_map_tasks}")
+            print(f"  已完成 Reduce: {job.completed_reduce_tasks}/{job.num_reduce_tasks}")
+
+            reused_maps = sum(1 for t in job.map_tasks if getattr(t, "is_reused", False))
+            print(f"  复用的 Map 输出: {reused_maps} 个")
+
+        print("\n⏳ 继续执行进度:")
+
+        status = framework.wait_for_job(restored_job_id, timeout=args.timeout, show_progress=True)
+
+        print(f"\n\n📊 最终结果:")
+        print(f"  状态: {status['state']}")
+
+        if status["state"] == "SUCCEEDED":
+            output_path = framework.finalize_job_output(restored_job_id)
+            results = framework.get_job_results(restored_job_id)
+
+            print(f"\n✅ 作业恢复并完成!")
+            print(f"  结果条数: {len(results)}")
+            print(f"  输出文件: {output_path}")
+
+            if args.show_report:
+                framework.print_job_report(restored_job_id)
+
+            return 0
+        else:
+            print(f"\n❌ 作业执行失败!")
+            return 1
+
+    except KeyboardInterrupt:
+        print("\n\n⏹️  用户中断...")
+        return 130
+    finally:
+        framework.stop()
+        print("集群已停止")
+
+
+def cmd_history(args):
+    """列出所有历史作业"""
+    framework = MapReduceFramework(output_dir=args.output, num_workers=1)
+    framework.start()
+
+    try:
+        history_jobs = framework.list_history_jobs()
+
+        print("=" * 90)
+        print(f"� 历史作业列表 (共 {len(history_jobs)} 个)")
+        print("=" * 90)
+        print(f"{'Job ID':<15} {'名称':<20} {'状态':<15} {'开始时间':<20} {'结束时间':<20}")
+        print("-" * 90)
+
+        for job in history_jobs:
+            start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job["start_time"])) if job.get("start_time") else "N/A"
+            end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job["end_time"])) if job.get("end_time") else "N/A"
+            print(f"{job['job_id']:<15} {job['name']:<20} {job['state']:<15} {start_time:<20} {end_time:<20}")
+
+        print("=" * 90)
+        return 0
+    finally:
+        framework.stop()
+
+
+def cmd_report(args):
+    """查看作业报告"""
+    framework = MapReduceFramework(output_dir=args.output, num_workers=1)
+    framework.start()
+
+    try:
+        # 先尝试从内存加载（如果是活动作业）
+        report = framework.get_job_report(args.job_id)
+
+        if not report:
+            # 从历史记录加载
+            report_data = framework.metadata_store.load_job_report(args.job_id)
+            if report_data:
+                from mapreduce.job import JobReport
+                report = JobReport(args.job_id, report_data.get("name", ""))
+                report.load(report_data)
+
+        if report:
+            report.pretty_print()
+            return 0
+        else:
+            print(f"❌ 未找到作业: {args.job_id}")
+            return 1
+    finally:
+        framework.stop()
 
 
 def cmd_status(args):
@@ -179,41 +316,54 @@ def cmd_status(args):
         framework.stop()
 
 
-def cmd_list(args):
-    """列出所有作业"""
-    framework = MapReduceFramework(output_dir=args.output, num_workers=1)
-    framework.start()
+def cmd_demo_recovery(args):
+    """失败恢复演示"""
+    print("=" * 70)
+    print("🧪 失败恢复演示")
+    print("=" * 70)
+    print("\n选择演示类型:")
+    print("  1. Worker 失败恢复 (同进程内模拟)")
+    print("  2. 进程重启恢复 (模拟进程退出后恢复)")
 
-    try:
-        jobs = framework.list_jobs()
-        print("=" * 80)
-        print(f"{'Job ID':<15} {'名称':<20} {'状态':<15} {'Map进度':<10} {'Reduce进度':<10}")
-        print("-" * 80)
-        for job in jobs:
-            map_p = f"{job['map_progress']*100:.0f}%"
-            reduce_p = f"{job['reduce_progress']*100:.0f}%"
-            print(f"{job['job_id']:<15} {job['name']:<20} {job['state']:<15} {map_p:<10} {reduce_p:<10}")
-        print("=" * 80)
-    finally:
-        framework.stop()
+    if args.type == "worker":
+        choice = "1"
+    elif args.type == "restart":
+        choice = "2"
+    else:
+        choice = input("\n请输入选项 (默认 1): ").strip() or "1"
+
+    from examples.demo_recovery import demo_worker_failure_recovery, demo_process_restart_recovery
+
+    if choice == "1":
+        success = demo_worker_failure_recovery()
+    elif choice == "2":
+        success = demo_process_restart_recovery()
+    else:
+        print("无效选项")
+        return 1
+
+    return 0 if success else 1
 
 
-def cmd_report(args):
-    """查看作业运行报告"""
-    framework = MapReduceFramework(output_dir=args.output, num_workers=1)
-    framework.start()
+def _print_dir_tree(path, prefix=""):
+    """打印目录树"""
+    if not os.path.isdir(path):
+        return
 
-    try:
-        report = framework.get_job_report(args.job_id)
-        if report:
-            report.pretty_print()
+    entries = sorted(os.listdir(path))
+    for i, entry in enumerate(entries):
+        full_path = os.path.join(path, entry)
+        is_last = i == len(entries) - 1
+        connector = "└── " if is_last else "├── "
+
+        if os.path.isdir(full_path):
+            print(f"{prefix}{connector}{entry}/")
+            extension = "    " if is_last else "│   "
+            _print_dir_tree(full_path, prefix + extension)
         else:
-            print(f"❌ 未找到作业: {args.job_id}")
-            return 1
-    finally:
-        framework.stop()
-
-    return 0
+            size = os.path.getsize(full_path)
+            size_str = f" ({size} bytes)" if size < 1024 else f" ({size//1024} KB)"
+            print(f"{prefix}{connector}{entry}{size_str}")
 
 
 def main():
@@ -228,22 +378,23 @@ def main():
   # 运行作业并显示结果和报告
   python cli.py run --input test_data/wordcount_input --job wordcount --show-results --show-report
 
-  # 使用 JSONL 输出格式
-  python cli.py run --input test_data/wordcount_input --job wordcount --format jsonl
-
-  # 查看集群状态
-  python cli.py status
-
-  # 列出所有作业
-  python cli.py list
+  # 列出所有历史作业
+  python cli.py history
 
   # 查看作业报告
   python cli.py report <job_id>
+
+  # 恢复作业
+  python cli.py resume --job-id <job_id> --input test_data/wordcount_input
+
+  # 失败恢复演示
+  python cli.py demo-recovery
         """
     )
 
     subparsers = parser.add_subparsers(dest="command", help="可用命令")
 
+    # run 命令
     run_parser = subparsers.add_parser("run", help="运行 MapReduce 作业")
     run_parser.add_argument("--input", "-i", required=True, help="输入文件或目录路径")
     run_parser.add_argument("--output", "-o", default="./output", help="输出目录 (默认: ./output)")
@@ -257,28 +408,54 @@ def main():
     run_parser.add_argument("--timeout", type=int, default=300, help="超时时间(秒) (默认: 300)")
     run_parser.add_argument("--show-results", action="store_true", help="显示结果预览")
     run_parser.add_argument("--show-report", action="store_true", help="显示详细作业报告")
+    run_parser.add_argument("--show-files", action="store_true", help="显示输出目录结构")
 
+    # resume 命令
+    resume_parser = subparsers.add_parser("resume", help="恢复一个已存在的作业")
+    resume_parser.add_argument("--job-id", required=True, help="作业 ID")
+    resume_parser.add_argument("--input", "-i", default=None, help="输入文件或目录路径 (可选)")
+    resume_parser.add_argument("--output", "-o", default="./output", help="输出目录 (默认: ./output)")
+    resume_parser.add_argument("--job", "-j", default="wordcount", help="作业类型 (默认: wordcount)")
+    resume_parser.add_argument("--num-workers", "-w", type=int, default=3, help="工作节点数")
+    resume_parser.add_argument("--split-by", choices=["lines", "size", "files"], default="lines", help="输入切分方式")
+    resume_parser.add_argument("--chunk-size", type=int, default=100, help="分片大小")
+    resume_parser.add_argument("--timeout", type=int, default=300, help="超时时间(秒)")
+    resume_parser.add_argument("--show-report", action="store_true", help="显示详细作业报告")
+
+    # history 命令
+    hist_parser = subparsers.add_parser("history", help="列出所有历史作业")
+    hist_parser.add_argument("--output", "-o", default="./output", help="输出目录")
+
+    # report 命令
+    report_parser = subparsers.add_parser("report", help="查看作业报告")
+    report_parser.add_argument("job_id", help="作业 ID")
+    report_parser.add_argument("--output", "-o", default="./output", help="输出目录")
+
+    # status 命令
     status_parser = subparsers.add_parser("status", help="查看集群状态")
     status_parser.add_argument("--output", "-o", default="./output", help="输出目录")
     status_parser.add_argument("--num-workers", "-w", type=int, default=3, help="工作节点数")
 
-    list_parser = subparsers.add_parser("list", help="列出所有作业")
-    list_parser.add_argument("--output", "-o", default="./output", help="输出目录")
-
-    report_parser = subparsers.add_parser("report", help="查看作业运行报告")
-    report_parser.add_argument("job_id", help="作业 ID")
-    report_parser.add_argument("--output", "-o", default="./output", help="输出目录")
+    # demo-recovery 命令
+    demo_parser = subparsers.add_parser("demo-recovery", help="失败恢复演示")
+    demo_parser.add_argument("--type", "-t", choices=["worker", "restart"],
+                             default=None, help="演示类型: worker 或 restart")
+    demo_parser.add_argument("--output", "-o", default="./output", help="输出目录")
 
     args = parser.parse_args()
 
     if args.command == "run":
         return cmd_run(args)
-    elif args.command == "status":
-        return cmd_status(args)
-    elif args.command == "list":
-        return cmd_list(args)
+    elif args.command == "resume":
+        return cmd_resume(args)
+    elif args.command == "history":
+        return cmd_history(args)
     elif args.command == "report":
         return cmd_report(args)
+    elif args.command == "status":
+        return cmd_status(args)
+    elif args.command == "demo-recovery":
+        return cmd_demo_recovery(args)
     else:
         parser.print_help()
         return 1
