@@ -1,0 +1,62 @@
+{
+  "job_id": "8e2a8f2991d7",
+  "name": "file-missing-demo",
+  "state": "SUCCEEDED",
+  "num_map_tasks": 6,
+  "num_reduce_tasks": 2,
+  "output_format": "text",
+  "start_time": 1781641300.9469645,
+  "end_time": 1781641304.184411,
+  "accepted_logical_tasks": [
+    "8e2a8f2991d7-m-3",
+    "8e2a8f2991d7-m-5",
+    "8e2a8f2991d7-r-0",
+    "8e2a8f2991d7-m-0",
+    "8e2a8f2991d7-m-1",
+    "8e2a8f2991d7-m-4",
+    "8e2a8f2991d7-r-1",
+    "8e2a8f2991d7-m-2"
+  ],
+  "map_outputs": {
+    "worker-0": [
+      "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0",
+      "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2",
+      "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-4",
+      "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0",
+      "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-5"
+    ],
+    "worker-1": [
+      "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-1",
+      "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-3",
+      "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2"
+    ]
+  },
+  "map_partition_files": {
+    "8e2a8f2991d7-m-1": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-1\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-1\\part-1.pickle"
+    },
+    "8e2a8f2991d7-m-3": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-3\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-3\\part-1.pickle"
+    },
+    "8e2a8f2991d7-m-4": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-4\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-4\\part-1.pickle"
+    },
+    "8e2a8f2991d7-m-0": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0\\part-1.pickle"
+    },
+    "8e2a8f2991d7-m-2": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2\\part-1.pickle"
+    },
+    "8e2a8f2991d7-m-5": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-5\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-5\\part-1.pickle"
+    }
+  },
+  "num_recoveries": 1,
+  "saved_at": 1781641304.3818564
+}

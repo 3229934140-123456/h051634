@@ -1,0 +1,362 @@
+{
+  "job_id": "59f4273e0d28",
+  "name": "worker-failure-demo",
+  "final_state": "SUCCEEDED",
+  "start_time": 1781641103.7689917,
+  "end_time": 1781641105.9905605,
+  "total_duration": 2.2215688228607178,
+  "final_output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\result.text",
+  "recovery_stats": {
+    "num_recoveries": 0,
+    "reused_map_outputs": 0,
+    "reused_reduce_outputs": 0,
+    "rerun_map_tasks": 0,
+    "rerun_reduce_tasks": 0
+  },
+  "map_tasks": [
+    {
+      "task_id": "59f4273e0d28-m-0",
+      "logical_task_id": "59f4273e0d28-m-0",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641103.770119,
+      "end_time": 1781641104.7872891,
+      "duration": 1.0171701908111572,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-0\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-0",
+        "start_idx": 0,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-0\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-0\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-1",
+      "logical_task_id": "59f4273e0d28-m-1",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641103.7703748,
+      "end_time": 1781641104.7877505,
+      "duration": 1.0173757076263428,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-1\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-1",
+        "start_idx": 20,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-1\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-1\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-2",
+      "logical_task_id": "59f4273e0d28-m-2",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-2",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641103.7705562,
+      "end_time": 1781641104.7873976,
+      "duration": 1.0168414115905762,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-2\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-2",
+        "start_idx": 40,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-2\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-2\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-3",
+      "logical_task_id": "59f4273e0d28-m-3",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641103.8719115,
+      "end_time": 1781641104.8890321,
+      "duration": 1.017120599746704,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-3\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-3",
+        "start_idx": 60,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-3\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-3\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-4",
+      "logical_task_id": "59f4273e0d28-m-4",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641103.8721604,
+      "end_time": 1781641104.8905,
+      "duration": 1.0183396339416504,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-4\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-4",
+        "start_idx": 80,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-4\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-4\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-5",
+      "logical_task_id": "59f4273e0d28-m-5",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-2",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641103.872345,
+      "end_time": 1781641104.8898683,
+      "duration": 1.0175232887268066,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-5\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-5",
+        "start_idx": 100,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-5\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-5\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-6",
+      "logical_task_id": "59f4273e0d28-m-6",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641104.8787737,
+      "end_time": 1781641105.896498,
+      "duration": 1.0177242755889893,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-6\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-6",
+        "start_idx": 120,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-6\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-6\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-7",
+      "logical_task_id": "59f4273e0d28-m-7",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-2",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641104.878924,
+      "end_time": 1781641105.8966994,
+      "duration": 1.017775535583496,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-7\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-7",
+        "start_idx": 140,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-7\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-7\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-1-retry-1-9690",
+      "logical_task_id": "59f4273e0d28-m-1",
+      "task_type": "MAP",
+      "state": "FAILED",
+      "worker_id": null,
+      "attempt": 2,
+      "is_speculative": false,
+      "result_accepted": false,
+      "is_reused": false,
+      "start_time": null,
+      "end_time": 1781641104.7892694,
+      "duration": 0.0,
+      "output_path": null,
+      "input_split": {
+        "split_id": "split-1",
+        "start_idx": 20,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {},
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-m-4-retry-1-1894",
+      "logical_task_id": "59f4273e0d28-m-4",
+      "task_type": "MAP",
+      "state": "FAILED",
+      "worker_id": null,
+      "attempt": 2,
+      "is_speculative": false,
+      "result_accepted": false,
+      "is_reused": false,
+      "start_time": null,
+      "end_time": 1781641104.8915832,
+      "duration": 0.0,
+      "output_path": null,
+      "input_split": {
+        "split_id": "split-4",
+        "start_idx": 80,
+        "length": 20,
+        "num_records": 20
+      },
+      "partition_id": null,
+      "partition_files": {},
+      "fetched_map_files": [],
+      "rerun_reason": null
+    }
+  ],
+  "reduce_tasks": [
+    {
+      "task_id": "59f4273e0d28-r-0",
+      "logical_task_id": "59f4273e0d28-r-0",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641105.985385,
+      "end_time": 1781641105.989604,
+      "duration": 0.00421905517578125,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\reduce-outputs\\59f4273e0d28-r-0.pickle",
+      "input_split": null,
+      "partition_id": 0,
+      "partition_files": {},
+      "fetched_map_files": [
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-0\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-1\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-2\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-3\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-4\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-5\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-6\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-7\\part-0.pickle"
+      ],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "59f4273e0d28-r-1",
+      "logical_task_id": "59f4273e0d28-r-1",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-2",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641105.9855926,
+      "end_time": 1781641105.9888344,
+      "duration": 0.0032417774200439453,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\reduce-outputs\\59f4273e0d28-r-1.pickle",
+      "input_split": null,
+      "partition_id": 1,
+      "partition_files": {},
+      "fetched_map_files": [
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-0\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-1\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-2\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-3\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-4\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-5\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-6\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-7\\part-1.pickle"
+      ],
+      "rerun_reason": null
+    }
+  ],
+  "summary": {
+    "total_map_tasks": 10,
+    "total_reduce_tasks": 2,
+    "accepted_map_results": 8,
+    "accepted_reduce_results": 2,
+    "failed_attempts": 2,
+    "speculative_attempts": 0,
+    "reused_map_outputs": 0,
+    "reused_reduce_outputs": 0
+  }
+}

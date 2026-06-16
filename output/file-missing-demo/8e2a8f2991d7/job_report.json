@@ -1,0 +1,253 @@
+{
+  "job_id": "8e2a8f2991d7",
+  "name": "file-missing-demo",
+  "final_state": "SUCCEEDED",
+  "start_time": 1781641300.9469645,
+  "end_time": 1781641304.184411,
+  "total_duration": 3.2374465465545654,
+  "final_output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\result.text",
+  "recovery_stats": {
+    "num_recoveries": 1,
+    "reused_map_outputs": 3,
+    "reused_reduce_outputs": 0,
+    "rerun_map_tasks": 3,
+    "rerun_reduce_tasks": 2,
+    "file_missing_rerun_map": 2
+  },
+  "map_tasks": [
+    {
+      "task_id": "8e2a8f2991d7-m-0",
+      "logical_task_id": "8e2a8f2991d7-m-0",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 3,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641302.9733074,
+      "end_time": 1781641303.583862,
+      "duration": 0.6105546951293945,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-0",
+        "start_idx": 0,
+        "length": 6,
+        "num_records": 6
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": "file_missing"
+    },
+    {
+      "task_id": "8e2a8f2991d7-m-1",
+      "logical_task_id": "8e2a8f2991d7-m-1",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": true,
+      "start_time": 1781641300.948353,
+      "end_time": 1781641301.5589151,
+      "duration": 0.6105620861053467,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-1\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-1",
+        "start_idx": 6,
+        "length": 6,
+        "num_records": 6
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-1\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-1\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "8e2a8f2991d7-m-2",
+      "logical_task_id": "8e2a8f2991d7-m-2",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 3,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641302.9734836,
+      "end_time": 1781641303.584087,
+      "duration": 0.6106033325195312,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-2",
+        "start_idx": 12,
+        "length": 6,
+        "num_records": 6
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": "file_missing"
+    },
+    {
+      "task_id": "8e2a8f2991d7-m-3",
+      "logical_task_id": "8e2a8f2991d7-m-3",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": true,
+      "start_time": 1781641301.049141,
+      "end_time": 1781641301.6591809,
+      "duration": 0.6100399494171143,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-3\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-3",
+        "start_idx": 18,
+        "length": 6,
+        "num_records": 6
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-3\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-3\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "8e2a8f2991d7-m-4",
+      "logical_task_id": "8e2a8f2991d7-m-4",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": true,
+      "start_time": 1781641301.653261,
+      "end_time": 1781641302.2633467,
+      "duration": 0.6100857257843018,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-4\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-4",
+        "start_idx": 24,
+        "length": 6,
+        "num_records": 6
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-4\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-4\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "8e2a8f2991d7-m-5",
+      "logical_task_id": "8e2a8f2991d7-m-5",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 2,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641303.074879,
+      "end_time": 1781641304.0914452,
+      "duration": 1.016566276550293,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-5\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-5",
+        "start_idx": 30,
+        "length": 10,
+        "num_records": 10
+      },
+      "partition_id": null,
+      "partition_files": {
+        "0": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-5\\part-0.pickle",
+        "1": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-5\\part-1.pickle"
+      },
+      "fetched_map_files": [],
+      "rerun_reason": null
+    }
+  ],
+  "reduce_tasks": [
+    {
+      "task_id": "8e2a8f2991d7-r-0",
+      "logical_task_id": "8e2a8f2991d7-r-0",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641304.180556,
+      "end_time": 1781641304.1831415,
+      "duration": 0.0025854110717773438,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\reduce-outputs\\8e2a8f2991d7-r-0.pickle",
+      "input_split": null,
+      "partition_id": 0,
+      "partition_files": {},
+      "fetched_map_files": [
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-1\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-3\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-4\\part-0.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-5\\part-0.pickle"
+      ],
+      "rerun_reason": null
+    },
+    {
+      "task_id": "8e2a8f2991d7-r-1",
+      "logical_task_id": "8e2a8f2991d7-r-1",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "is_reused": false,
+      "start_time": 1781641304.180781,
+      "end_time": 1781641304.1833777,
+      "duration": 0.0025968551635742188,
+      "output_path": "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\reduce-outputs\\8e2a8f2991d7-r-1.pickle",
+      "input_split": null,
+      "partition_id": 1,
+      "partition_files": {},
+      "fetched_map_files": [
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-0\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-1\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-2\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-3\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-4\\part-1.pickle",
+        "D:\\trae-bz\\TraeProjects\\34\\output\\file-missing-demo\\8e2a8f2991d7\\map-outputs\\8e2a8f2991d7-m-5\\part-1.pickle"
+      ],
+      "rerun_reason": null
+    }
+  ],
+  "summary": {
+    "total_map_tasks": 6,
+    "total_reduce_tasks": 2,
+    "accepted_map_results": 6,
+    "accepted_reduce_results": 2,
+    "failed_attempts": 0,
+    "speculative_attempts": 0,
+    "reused_map_outputs": 3,
+    "reused_reduce_outputs": 0
+  }
+}

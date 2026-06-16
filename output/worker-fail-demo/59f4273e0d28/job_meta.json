@@ -1,0 +1,74 @@
+{
+  "job_id": "59f4273e0d28",
+  "name": "worker-failure-demo",
+  "state": "SUCCEEDED",
+  "num_map_tasks": 8,
+  "num_reduce_tasks": 2,
+  "output_format": "text",
+  "start_time": 1781641103.7689917,
+  "end_time": 1781641105.9905605,
+  "accepted_logical_tasks": [
+    "59f4273e0d28-m-7",
+    "59f4273e0d28-m-3",
+    "59f4273e0d28-m-1",
+    "59f4273e0d28-r-0",
+    "59f4273e0d28-m-0",
+    "59f4273e0d28-m-5",
+    "59f4273e0d28-r-1",
+    "59f4273e0d28-m-4",
+    "59f4273e0d28-m-6",
+    "59f4273e0d28-m-2"
+  ],
+  "map_outputs": {
+    "worker-0": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-0",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-3",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-6"
+    ],
+    "worker-2": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-2",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-5",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-7"
+    ],
+    "worker-1": [
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-1",
+      "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-4"
+    ]
+  },
+  "map_partition_files": {
+    "59f4273e0d28-m-0": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-0\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-0\\part-1.pickle"
+    },
+    "59f4273e0d28-m-2": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-2\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-2\\part-1.pickle"
+    },
+    "59f4273e0d28-m-1": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-1\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-1\\part-1.pickle"
+    },
+    "59f4273e0d28-m-3": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-3\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-3\\part-1.pickle"
+    },
+    "59f4273e0d28-m-5": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-5\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-5\\part-1.pickle"
+    },
+    "59f4273e0d28-m-4": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-4\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-4\\part-1.pickle"
+    },
+    "59f4273e0d28-m-6": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-6\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-6\\part-1.pickle"
+    },
+    "59f4273e0d28-m-7": {
+      "0": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-7\\part-0.pickle",
+      "1": "D:\\trae-bz\\TraeProjects\\34\\examples\\..\\output\\worker-fail-demo\\59f4273e0d28\\map-outputs\\59f4273e0d28-m-7\\part-1.pickle"
+    }
+  },
+  "num_recoveries": 0,
+  "saved_at": 1781641106.1779706
+}

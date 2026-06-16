@@ -133,6 +133,9 @@ class TaskScheduler:
         if not task:
             return False
 
+        if task.result_accepted:
+            return True
+
         task.mark_failed()
 
         worker = self.workers.get(task.worker_id) if task.worker_id else None
@@ -148,11 +151,24 @@ class TaskScheduler:
             return True
 
         if task.attempt < 4:
-            task.state = TaskState.PENDING
-            task.worker_id = None
-            task.start_time = None
-            task.end_time = None
-            task.is_speculative = False
+            from .common import generate_id
+            retry_suffix = generate_id()[:4]
+            retry_task_id = f"{task.logical_task_id}-retry-{task.attempt}-{retry_suffix}"
+            retry_task = type(task)(
+                task_id=retry_task_id,
+                task_type=task.task_type,
+                job_id=task.job_id,
+                logical_task_id=task.logical_task_id,
+                state=TaskState.PENDING,
+                attempt=task.attempt + 1,
+                input_split=task.input_split,
+                partition_id=task.partition_id,
+                is_speculative=False
+            )
+            if task.task_type == TaskType.MAP:
+                job.map_tasks.append(retry_task)
+            else:
+                job.reduce_tasks.append(retry_task)
         else:
             has_other_attempts = any(
                 t.logical_task_id == task.logical_task_id

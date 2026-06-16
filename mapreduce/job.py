@@ -52,7 +52,8 @@ class JobReport:
             } if task.input_split else None,
             "partition_id": task.partition_id,
             "partition_files": partition_files if partition_files else {},
-            "fetched_map_files": fetched_map_files if fetched_map_files else []
+            "fetched_map_files": fetched_map_files if fetched_map_files else [],
+            "rerun_reason": getattr(task, "rerun_reason", None)
         }
         if task.task_type == TaskType.MAP:
             self.map_task_reports.append(report)
@@ -113,13 +114,16 @@ class JobReport:
         print(f"结束时间: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.end_time)) if self.end_time else 'N/A'}")
         print(f"最终输出: {self.final_output_path}")
 
-        if self.recovery_stats.get("num_recoveries", 0) > 0:
+        if self.recovery_stats.get("num_recoveries", 0) > 0 or self.recovery_stats.get("rerun_map_tasks", 0) > 0:
             print(f"\n🔄 恢复统计:")
-            print(f"  恢复次数: {self.recovery_stats['num_recoveries']}")
-            print(f"  复用 Map 输出: {self.recovery_stats['reused_map_outputs']} 个")
-            print(f"  复用 Reduce 输出: {self.recovery_stats['reused_reduce_outputs']} 个")
-            print(f"  重跑 Map 任务: {self.recovery_stats['rerun_map_tasks']} 个")
-            print(f"  重跑 Reduce 任务: {self.recovery_stats['rerun_reduce_tasks']} 个")
+            print(f"  恢复次数: {self.recovery_stats.get('num_recoveries', 0)}")
+            print(f"  复用 Map 输出: {self.recovery_stats.get('reused_map_outputs', 0)} 个")
+            print(f"  复用 Reduce 输出: {self.recovery_stats.get('reused_reduce_outputs', 0)} 个")
+            print(f"  重跑 Map 任务: {self.recovery_stats.get('rerun_map_tasks', 0)} 个")
+            print(f"  重跑 Reduce 任务: {self.recovery_stats.get('rerun_reduce_tasks', 0)} 个")
+            missing = self.recovery_stats.get("file_missing_rerun_map", 0)
+            if missing > 0:
+                print(f"  ⚠️  文件缺失导致重跑: {missing} 个 Map 分片")
 
         print(f"\n📋 概览:")
         print(f"  Map 任务尝试: {self.summary['total_map_tasks']} 次 (成功采纳: {self.summary['accepted_map_results']})")
@@ -132,9 +136,19 @@ class JobReport:
         print(f"{'-'*78}")
         for r in self.map_task_reports:
             spec = "是" if r["is_speculative"] else "否"
-            accepted = "✅" if r["result_accepted"] else "❌"
+            state_str = TaskState(r["state"]).name
+            if r["result_accepted"]:
+                accepted = "✅"
+            elif state_str == "FAILED":
+                accepted = "💥"
+            else:
+                accepted = "❌"
             reused = "♻️" if r.get("is_reused", False) else " "
             print(f"{r['task_id']:<32} {accepted:<5} {spec:<5} {reused:<5} {str(r['worker_id']):<10} {r['duration']:<10.2f} {r['attempt']:<6}")
+            if state_str == "FAILED":
+                print(f"  ↳ ❌ 失败 (在 worker={r['worker_id']} 运行时失败)")
+            if r.get("rerun_reason") == "file_missing":
+                print(f"  ↳ ⚠️  文件缺失重跑：原分区文件丢失，重新执行此分片")
             if r["input_split"]:
                 s = r["input_split"]
                 print(f"  ↳ 分片: {s['start_idx']}-{s['start_idx']+s['length']} ({s['num_records']} 条)")
@@ -148,9 +162,19 @@ class JobReport:
         print(f"{'-'*78}")
         for r in self.reduce_task_reports:
             spec = "是" if r["is_speculative"] else "否"
-            accepted = "✅" if r["result_accepted"] else "❌"
+            state_str = TaskState(r["state"]).name
+            if r["result_accepted"]:
+                accepted = "✅"
+            elif state_str == "FAILED":
+                accepted = "💥"
+            else:
+                accepted = "❌"
             reused = "♻️" if r.get("is_reused", False) else " "
             print(f"{r['task_id']:<32} {accepted:<5} {spec:<5} {reused:<5} {str(r['worker_id']):<10} {r['duration']:<10.2f} {r['attempt']:<6}")
+            if state_str == "FAILED":
+                print(f"  ↳ ❌ 失败 (在 worker={r['worker_id']} 运行时失败)")
+            if r.get("rerun_reason") == "file_missing":
+                print(f"  ↳ ⚠️  文件缺失重跑：原输出文件丢失，重新执行此 reduce")
             print(f"  ↳ 分区: {r['partition_id']}, 输出: {r['output_path']}")
             if r.get("fetched_map_files"):
                 print(f"  ↳ 拉取 Map 文件 ({len(r['fetched_map_files'])} 个):")
@@ -381,7 +405,8 @@ class Job:
             "is_speculative": task.is_speculative,
             "result_accepted": task.result_accepted,
             "is_reused": getattr(task, "is_reused", False),
-            "fetched_map_files": getattr(task, "fetched_map_files", [])
+            "fetched_map_files": getattr(task, "fetched_map_files", []),
+            "rerun_reason": getattr(task, "rerun_reason", None)
         }
 
     def _deserialize_task(self, data: Dict) -> Task:
@@ -411,6 +436,9 @@ class Job:
         fetched = data.get("fetched_map_files", [])
         if fetched:
             setattr(task, "fetched_map_files", fetched)
+        rerun_reason = data.get("rerun_reason")
+        if rerun_reason:
+            setattr(task, "rerun_reason", rerun_reason)
         return task
 
     @classmethod
@@ -468,12 +496,15 @@ class Job:
         return job
 
     def prepare_for_resume(self) -> Dict[str, int]:
-        """准备恢复运行，重置未完成的任务状态，返回恢复统计"""
+        """准备恢复运行，重置未完成的任务状态，返回恢复统计
+        会检测已采纳的 map 分区文件是否完整，文件缺失则标记为文件缺失重跑
+        """
         stats = {
             "reused_map_outputs": 0,
             "reused_reduce_outputs": 0,
             "rerun_map_tasks": 0,
-            "rerun_reduce_tasks": 0
+            "rerun_reduce_tasks": 0,
+            "file_missing_rerun_map": 0
         }
 
         if self.state == JobState.SUCCEEDED:
@@ -483,10 +514,38 @@ class Job:
                           JobState.RUNNING, JobState.PENDING):
             pass
 
+        map_outputs_base = os.path.join(self.output_dir, "map-outputs")
+
         for task in self.map_tasks:
             if task.result_accepted:
-                stats["reused_map_outputs"] += 1
-                setattr(task, "is_reused", True)
+                task_map_dir = os.path.join(map_outputs_base, task.task_id)
+                files_ok = True
+                partition_count = self.num_reduce_tasks
+                for p in range(partition_count):
+                    part_file = os.path.join(task_map_dir, f"part-{p}.pickle")
+                    if not os.path.exists(part_file):
+                        files_ok = False
+                        break
+
+                if files_ok:
+                    stats["reused_map_outputs"] += 1
+                    setattr(task, "is_reused", True)
+                else:
+                    stats["reused_map_outputs"] = max(0, stats["reused_map_outputs"] - 0)
+                    if task.logical_task_id in self.accepted_logical_tasks:
+                        self.accepted_logical_tasks.discard(task.logical_task_id)
+                    task.result_accepted = False
+                    task.state = TaskState.PENDING
+                    task.worker_id = None
+                    task.start_time = None
+                    task.end_time = None
+                    task.attempt += 1
+                    setattr(task, "is_reused", False)
+                    setattr(task, "rerun_reason", "file_missing")
+                    stats["rerun_map_tasks"] += 1
+                    stats["file_missing_rerun_map"] += 1
+                    if task.task_id in self.map_partition_files:
+                        del self.map_partition_files[task.task_id]
             elif task.state in (TaskState.ASSIGNED, TaskState.RUNNING):
                 task.state = TaskState.PENDING
                 task.worker_id = None
@@ -501,10 +560,26 @@ class Job:
                     task.worker_id = None
                     stats["rerun_map_tasks"] += 1
 
+        reduce_outputs_base = os.path.join(self.output_dir, "reduce-outputs")
         for task in self.reduce_tasks:
             if task.result_accepted:
-                stats["reused_reduce_outputs"] += 1
-                setattr(task, "is_reused", True)
+                reduce_file = os.path.join(reduce_outputs_base, f"{task.task_id}.pickle")
+                files_ok = os.path.exists(reduce_file)
+                if files_ok:
+                    stats["reused_reduce_outputs"] += 1
+                    setattr(task, "is_reused", True)
+                else:
+                    if task.logical_task_id in self.accepted_logical_tasks:
+                        self.accepted_logical_tasks.discard(task.logical_task_id)
+                    task.result_accepted = False
+                    task.state = TaskState.PENDING
+                    task.worker_id = None
+                    task.start_time = None
+                    task.end_time = None
+                    task.attempt += 1
+                    setattr(task, "is_reused", False)
+                    setattr(task, "rerun_reason", "file_missing")
+                    stats["rerun_reduce_tasks"] += 1
             elif task.state in (TaskState.ASSIGNED, TaskState.RUNNING):
                 task.state = TaskState.PENDING
                 task.worker_id = None
@@ -530,6 +605,7 @@ class Job:
         self.report.recovery_stats["reused_reduce_outputs"] = stats["reused_reduce_outputs"]
         self.report.recovery_stats["rerun_map_tasks"] = stats["rerun_map_tasks"]
         self.report.recovery_stats["rerun_reduce_tasks"] = stats["rerun_reduce_tasks"]
+        self.report.recovery_stats["file_missing_rerun_map"] = stats.get("file_missing_rerun_map", 0)
 
         self.state = JobState.RUNNING
 

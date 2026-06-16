@@ -240,28 +240,99 @@ def cmd_resume(args):
 
 
 def cmd_history(args):
-    """列出所有历史作业"""
-    framework = MapReduceFramework(output_dir=args.output, num_workers=1)
-    framework.start()
+    """列出所有历史作业（含空间占用）"""
+    from mapreduce.metadata import JobMetadataStore
+    store = JobMetadataStore(args.output)
+    history_jobs = store.list_jobs_with_size()
 
-    try:
-        history_jobs = framework.list_history_jobs()
+    col_w = 15 if getattr(args, "verbose", False) else 90
+    print("=" * col_w)
+    header = f"📋 历史作业列表 (共 {len(history_jobs)} 个)"
+    if not getattr(args, "verbose", False):
+        print(header)
+        print("=" * col_w)
+        print(f"{'Job ID':<15} {'名称':<20} {'状态':<12} {'占用':<10} {'开始时间':<20} {'结束时间':<20}")
+        print("-" * col_w)
+    else:
+        print(header)
+        print("=" * col_w)
+        print(f"{'Job ID':<15} {'名称':<20} {'状态':<12} {'占用':<10} {'开始时间':<20} {'结束时间':<20}")
+        print("-" * col_w)
 
-        print("=" * 90)
-        print(f"� 历史作业列表 (共 {len(history_jobs)} 个)")
-        print("=" * 90)
-        print(f"{'Job ID':<15} {'名称':<20} {'状态':<15} {'开始时间':<20} {'结束时间':<20}")
-        print("-" * 90)
+    for job in history_jobs:
+        start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job["start_time"])) if job.get("start_time") else "N/A"
+        end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job["end_time"])) if job.get("end_time") else "N/A"
+        size = job.get("size", "0 B")
+        print(f"{job['job_id']:<15} {job['name']:<20} {job['state']:<12} {size:<10} {start_time:<20} {end_time:<20}")
 
-        for job in history_jobs:
-            start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job["start_time"])) if job.get("start_time") else "N/A"
-            end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job["end_time"])) if job.get("end_time") else "N/A"
-            print(f"{job['job_id']:<15} {job['name']:<20} {job['state']:<15} {start_time:<20} {end_time:<20}")
+    if history_jobs:
+        total_size = sum(j.get("size_bytes", 0) for j in history_jobs)
+        print("-" * col_w)
+        print(f"{'':15} {'':20} {'':12} 总占用: {store.format_size(total_size)}")
 
-        print("=" * 90)
+    print("=" * col_w)
+    return 0
+
+
+def cmd_result(args):
+    """按 job id 查看结果文件内容"""
+    from mapreduce.metadata import JobMetadataStore
+    store = JobMetadataStore(args.output)
+
+    if not store.job_exists(args.job_id):
+        print(f"❌ 未找到作业: {args.job_id}")
+        return 1
+
+    max_lines = getattr(args, "lines", 0)
+    fmt = getattr(args, "format", None)
+    data = store.read_result_file(args.job_id, max_lines=max_lines, output_format=fmt)
+
+    if not data:
+        print(f"❌ 作业 {args.job_id} 暂无结果文件（作业可能未完成或结果已删除）")
+        return 1
+
+    print("=" * 80)
+    print(f"📄 作业结果: {args.job_id}")
+    print("=" * 80)
+    print(f"  路径: {data['path']}")
+    print(f"  格式: {data['format']}")
+    print(f"  总行数: {data['total_lines']}")
+    if data["truncated"]:
+        print(f"  ⚠️  仅显示前 {max_lines} 行")
+    print("-" * 80)
+    for line in data["lines"]:
+        print(f"  {line}")
+    if data["truncated"]:
+        print(f"  ... 还有 {data['total_lines'] - max_lines} 行，用 --lines 0 查看全部")
+    print("=" * 80)
+    return 0
+
+
+def cmd_delete(args):
+    """删除指定作业的元数据和输出文件"""
+    from mapreduce.metadata import JobMetadataStore
+    store = JobMetadataStore(args.output)
+
+    if not store.job_exists(args.job_id):
+        print(f"❌ 未找到作业: {args.job_id}")
+        return 1
+
+    size_before = store.get_job_size(args.job_id)
+    size_str = store.format_size(size_before)
+
+    if not args.yes:
+        confirm = input(f"⚠️  即将删除作业 {args.job_id} (占用 {size_str})，此操作不可恢复！\n确认删除? [y/N] ").strip().lower()
+        if confirm not in ("y", "yes"):
+            print("已取消删除")
+            return 0
+
+    ok = store.delete_job(args.job_id)
+    if ok:
+        print(f"✅ 作业 {args.job_id} 已删除，释放空间 {size_str}")
         return 0
-    finally:
-        framework.stop()
+    else:
+        print(f"❌ 删除作业 {args.job_id} 失败")
+        return 1
 
 
 def cmd_report(args):
@@ -436,6 +507,21 @@ def main():
     status_parser.add_argument("--output", "-o", default="./output", help="输出目录")
     status_parser.add_argument("--num-workers", "-w", type=int, default=3, help="工作节点数")
 
+    # result 命令
+    result_parser = subparsers.add_parser("result", help="查看作业结果内容")
+    result_parser.add_argument("job_id", help="作业 ID")
+    result_parser.add_argument("--output", "-o", default="./output", help="输出目录")
+    result_parser.add_argument("--lines", "-n", type=int, default=0,
+                               help="显示前 N 行，0 表示全部 (默认: 0)")
+    result_parser.add_argument("--format", "-f", choices=["text", "jsonl"], default=None,
+                               help="结果格式（默认自动匹配）")
+
+    # delete 命令
+    delete_parser = subparsers.add_parser("delete", help="删除作业的元数据和输出文件")
+    delete_parser.add_argument("job_id", help="作业 ID")
+    delete_parser.add_argument("--output", "-o", default="./output", help="输出目录")
+    delete_parser.add_argument("--yes", "-y", action="store_true", help="跳过确认提示")
+
     # demo-recovery 命令
     demo_parser = subparsers.add_parser("demo-recovery", help="失败恢复演示")
     demo_parser.add_argument("--type", "-t", choices=["worker", "restart"],
@@ -452,6 +538,10 @@ def main():
         return cmd_history(args)
     elif args.command == "report":
         return cmd_report(args)
+    elif args.command == "result":
+        return cmd_result(args)
+    elif args.command == "delete":
+        return cmd_delete(args)
     elif args.command == "status":
         return cmd_status(args)
     elif args.command == "demo-recovery":

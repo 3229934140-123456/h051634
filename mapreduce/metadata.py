@@ -191,10 +191,92 @@ class JobMetadataStore:
             return json.load(f)
 
     def cleanup_job(self, job_id: str) -> bool:
-        """清理作业数据"""
+        """清理作业数据（删除整个作业目录）"""
         import shutil
         job_dir = self._get_job_dir(job_id)
         if os.path.exists(job_dir):
             shutil.rmtree(job_dir)
             return True
         return False
+
+    def delete_job(self, job_id: str) -> bool:
+        """删除作业（同 cleanup_job，语义更明确）"""
+        return self.cleanup_job(job_id)
+
+    def get_job_size(self, job_id: str) -> int:
+        """计算作业目录总大小（字节）"""
+        job_dir = self._get_job_dir(job_id)
+        total = 0
+        if not os.path.exists(job_dir):
+            return 0
+        for root, dirs, files in os.walk(job_dir):
+            for f in files:
+                fp = os.path.join(root, f)
+                try:
+                    total += os.path.getsize(fp)
+                except OSError:
+                    pass
+        return total
+
+    def format_size(self, size_bytes: int) -> str:
+        """格式化字节大小为可读字符串"""
+        if size_bytes < 1024:
+            return f"{size_bytes} B"
+        elif size_bytes < 1024 * 1024:
+            return f"{size_bytes / 1024:.1f} KB"
+        elif size_bytes < 1024 * 1024 * 1024:
+            return f"{size_bytes / (1024 * 1024):.1f} MB"
+        else:
+            return f"{size_bytes / (1024 * 1024 * 1024):.1f} GB"
+
+    def list_jobs_with_size(self) -> List[Dict]:
+        """列出所有历史作业并包含空间占用"""
+        jobs = self.list_jobs()
+        for job in jobs:
+            job["size_bytes"] = self.get_job_size(job["job_id"])
+            job["size"] = self.format_size(job["size_bytes"])
+        return jobs
+
+    def read_result_file(self, job_id: str, max_lines: int = 0, output_format: str = None) -> Optional[Dict]:
+        """
+        读取作业结果文件内容
+        返回 { 'path': str, 'format': str, 'lines': List[str], 'total_lines': int, 'truncated': bool }
+        max_lines=0 表示读取全部
+        """
+        meta = self.load_job_meta(job_id)
+        fmt = output_format or (meta.get("output_format") if meta else "text") or "text"
+
+        result_path = self.get_job_result_path(job_id, fmt)
+        if not result_path:
+            result_path = self.get_job_result_path(job_id, "text")
+            if result_path:
+                fmt = "text"
+            else:
+                result_path = self.get_job_result_path(job_id, "jsonl")
+                if result_path:
+                    fmt = "jsonl"
+                else:
+                    return None
+
+        lines = []
+        total = 0
+        truncated = False
+
+        try:
+            with open(result_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    total += 1
+                    if max_lines > 0 and total > max_lines:
+                        truncated = True
+                        continue
+                    lines.append(line.rstrip("\n"))
+        except OSError:
+            return None
+
+        return {
+            "path": result_path,
+            "format": fmt,
+            "lines": lines,
+            "total_lines": total,
+            "truncated": truncated
+        }
