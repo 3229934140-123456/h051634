@@ -122,13 +122,13 @@ class Worker:
         if task.partition_id is None:
             raise ValueError("Reduce task has no partition id")
 
-        completed_map_ids = [t.task_id for t in job.map_tasks if t.state == TaskState.COMPLETED]
+        accepted_map_ids = [t.task_id for t in job.map_tasks if t.result_accepted]
 
         if self.shuffle_manager:
             shuffled_data = self.shuffle_manager.get_partition_inputs(
                 job.job_id,
                 task.partition_id,
-                completed_map_ids
+                accepted_map_ids
             )
         else:
             shuffled_data = []

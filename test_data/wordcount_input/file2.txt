@@ -1,0 +1,4 @@
+Big data processing with MapReduce
+Hello big data world
+Distributed computing is powerful
+MapReduce model is simple yet powerful

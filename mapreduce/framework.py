@@ -1,14 +1,15 @@
 import time
 import threading
+import os
 from typing import Dict, List, Optional, Callable, Any
 from .common import (
     JobState, TaskState, TaskType, Task,
     WorkerStatus, generate_id
 )
-from .job import JobTracker, Job
+from .job import JobTracker, Job, JobReport
 from .scheduler import TaskScheduler
 from .worker import Worker
-from .shuffle import ShuffleManager
+from .shuffle import ShuffleManager, read_input_files
 from .fault_tolerance import FaultToleranceManager
 
 
@@ -26,6 +27,10 @@ class MapReduceFramework:
         self._running = False
         self._scheduler_thread: Optional[threading.Thread] = None
         self._heartbeat_thread: Optional[threading.Thread] = None
+        self._status_monitor_thread: Optional[threading.Thread] = None
+        self._status_callbacks: Dict[str, Callable] = {}
+
+        os.makedirs(output_dir, exist_ok=True)
 
         for i in range(num_workers):
             self.add_worker(f"worker-{i}")
@@ -41,7 +46,7 @@ class MapReduceFramework:
         self.worker_statuses[worker_id] = worker.status
         return worker_id
 
-    def start(self):
+    def start(self, monitor_status: bool = True):
         if self._running:
             return
 
@@ -57,6 +62,10 @@ class MapReduceFramework:
         self._heartbeat_thread = threading.Thread(target=self._heartbeat_loop, daemon=True)
         self._heartbeat_thread.start()
 
+        if monitor_status:
+            self._status_monitor_thread = threading.Thread(target=self._status_monitor_loop, daemon=True)
+            self._status_monitor_thread.start()
+
     def stop(self):
         self._running = False
         self.fault_tolerance.stop_monitor()
@@ -66,6 +75,8 @@ class MapReduceFramework:
             self._scheduler_thread.join(timeout=2.0)
         if self._heartbeat_thread:
             self._heartbeat_thread.join(timeout=2.0)
+        if self._status_monitor_thread:
+            self._status_monitor_thread.join(timeout=2.0)
 
     def _scheduler_loop(self):
         while self._running:
@@ -110,6 +121,7 @@ class MapReduceFramework:
 
         if job.state == JobState.PENDING:
             self.job_tracker.update_job_state(job.job_id, JobState.RUNNING)
+            self._notify_status_change(job.job_id)
 
         thread = threading.Thread(
             target=self._execute_task,
@@ -121,6 +133,7 @@ class MapReduceFramework:
     def _execute_task(self, task: Task, worker: Worker, job: Job):
         try:
             task.mark_running(worker.worker_id)
+            self._notify_status_change(job.job_id)
 
             if task.task_type == TaskType.MAP:
                 output_path = self._run_map_task(task, job)
@@ -141,6 +154,7 @@ class MapReduceFramework:
             worker.status.available = len(worker.status.running_tasks) < (
                 worker.status.num_map_slots + worker.status.num_reduce_slots
             )
+            self._notify_status_change(job.job_id)
 
     def _run_map_task(self, task: Task, job: Job) -> str:
         if not task.input_split:
@@ -166,9 +180,9 @@ class MapReduceFramework:
         if task.partition_id is None:
             raise ValueError("Reduce task has no partition id")
 
-        completed_map_ids = [t.task_id for t in job.map_tasks if t.state == TaskState.COMPLETED]
+        accepted_map_ids = [t.task_id for t in job.map_tasks if t.result_accepted]
         shuffled_data = self.shuffle_manager.get_partition_inputs(
-            job.job_id, task.partition_id, completed_map_ids
+            job.job_id, task.partition_id, accepted_map_ids
         )
 
         sorted_data = sorted(shuffled_data, key=lambda x: str(x[0]))
@@ -200,16 +214,16 @@ class MapReduceFramework:
         )
 
     def _cleanup_speculative_tasks(self, completed_task: Task, job: Job):
-        if completed_task.is_speculative:
+        if not completed_task.result_accepted:
             return
 
         all_tasks = job.map_tasks if completed_task.task_type == TaskType.MAP else job.reduce_tasks
         for task in all_tasks:
-            if task.is_speculative and task.state in (TaskState.PENDING, TaskState.ASSIGNED, TaskState.RUNNING):
-                orig_base = completed_task.task_id.rsplit("-", 1)[0] if "-spec-" not in completed_task.task_id else ""
-                if orig_base and task.task_id.startswith(orig_base):
-                    task.state = TaskState.FAILED
-                    task.end_time = time.time()
+            if (task.logical_task_id == completed_task.logical_task_id
+                    and task.task_id != completed_task.task_id
+                    and task.state in (TaskState.PENDING, TaskState.ASSIGNED, TaskState.RUNNING)):
+                task.state = TaskState.FAILED
+                task.end_time = time.time()
 
     def _heartbeat_loop(self):
         while self._running:
@@ -218,6 +232,22 @@ class MapReduceFramework:
                     worker.heartbeat()
             time.sleep(1.0)
 
+    def _status_monitor_loop(self):
+        while self._running:
+            for job_id in list(self._status_callbacks.keys()):
+                status = self.get_job_status(job_id)
+                if status.get("state") in ("SUCCEEDED", "FAILED"):
+                    callback = self._status_callbacks.pop(job_id, None)
+                    if callback:
+                        try:
+                            callback(status)
+                        except Exception:
+                            pass
+            time.sleep(0.5)
+
+    def _notify_status_change(self, job_id: str):
+        pass
+
     def submit_job(
         self,
         name: str,
@@ -225,7 +255,8 @@ class MapReduceFramework:
         map_func: Callable,
         reduce_func: Callable,
         num_map_tasks: int = 0,
-        num_reduce_tasks: int = 2
+        num_reduce_tasks: int = 2,
+        output_format: str = "text"
     ) -> str:
         job_id = self.job_tracker.submit_job(
             name=name,
@@ -234,20 +265,65 @@ class MapReduceFramework:
             reduce_func=reduce_func,
             num_map_tasks=num_map_tasks,
             num_reduce_tasks=num_reduce_tasks,
-            output_dir=self.output_dir
+            output_dir=self.output_dir,
+            output_format=output_format
         )
         return job_id
+
+    def submit_job_from_files(
+        self,
+        name: str,
+        input_dir: str,
+        map_func: Callable,
+        reduce_func: Callable,
+        split_by: str = "lines",
+        chunk_size: int = 100,
+        num_map_tasks: int = 0,
+        num_reduce_tasks: int = 2,
+        output_format: str = "text"
+    ) -> str:
+        input_data = read_input_files(input_dir, split_by, chunk_size)
+        return self.submit_job(
+            name=name,
+            input_data=input_data,
+            map_func=map_func,
+            reduce_func=reduce_func,
+            num_map_tasks=num_map_tasks,
+            num_reduce_tasks=num_reduce_tasks,
+            output_format=output_format
+        )
 
     def get_job_status(self, job_id: str) -> Dict:
         return self.job_tracker.get_job_status(job_id)
 
-    def wait_for_job(self, job_id: str, timeout: float = 300.0) -> Dict:
+    def wait_for_job(self, job_id: str, timeout: float = 300.0, show_progress: bool = False) -> Dict:
         start_time = time.time()
+        last_state = None
+        last_progress = (-1, -1)
+
         while self._running and time.time() - start_time < timeout:
             status = self.job_tracker.get_job_status(job_id)
-            if status.get("state") in ("SUCCEEDED", "FAILED"):
+            state = status.get("state")
+            map_p = int(status.get("map_progress", 0) * 100)
+            reduce_p = int(status.get("reduce_progress", 0) * 100)
+
+            if show_progress:
+                if state != last_state or (map_p, reduce_p) != last_progress:
+                    last_state = state
+                    last_progress = (map_p, reduce_p)
+                    bar_map = "=" * (map_p // 5) + " " * (20 - map_p // 5)
+                    bar_reduce = "=" * (reduce_p // 5) + " " * (20 - reduce_p // 5)
+                    print(f"\r[{state}] Map: [{bar_map}] {map_p:3d}%  Reduce: [{bar_reduce}] {reduce_p:3d}%", end="")
+
+            if state in ("SUCCEEDED", "FAILED"):
+                if show_progress:
+                    print()
                 return status
-            time.sleep(0.5)
+
+            time.sleep(0.3)
+
+        if show_progress:
+            print()
         return self.job_tracker.get_job_status(job_id)
 
     def get_job_results(self, job_id: str) -> List:
@@ -255,6 +331,25 @@ class MapReduceFramework:
         if not job:
             return []
         return self.shuffle_manager.get_final_results(job_id, job.num_reduce_tasks)
+
+    def get_job_report(self, job_id: str) -> Optional[JobReport]:
+        return self.job_tracker.get_job_report(job_id)
+
+    def finalize_job_output(self, job_id: str) -> Optional[str]:
+        job = self.job_tracker.get_job(job_id)
+        if not job or job.state != JobState.SUCCEEDED:
+            return None
+
+        results = self.get_job_results(job_id)
+        output_path = self.shuffle_manager.write_final_results(
+            job_id, results, job.output_format
+        )
+
+        report = self.get_job_report(job_id)
+        if report:
+            report.save(job.output_dir)
+
+        return output_path
 
     def list_jobs(self) -> List[Dict]:
         return self.job_tracker.list_jobs()
@@ -280,3 +375,8 @@ class MapReduceFramework:
                 "failed": len(self.job_tracker.failed_jobs)
             }
         }
+
+    def print_job_report(self, job_id: str):
+        report = self.get_job_report(job_id)
+        if report:
+            report.pretty_print()

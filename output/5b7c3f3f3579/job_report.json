@@ -1,0 +1,74 @@
+{
+  "job_id": "5b7c3f3f3579",
+  "name": "wordcount",
+  "final_state": "SUCCEEDED",
+  "start_time": 1781637823.4139023,
+  "end_time": 1781637823.5173142,
+  "total_duration": 0.10341191291809082,
+  "final_output_path": "./output\\5b7c3f3f3579\\result.jsonl",
+  "map_tasks": [
+    {
+      "task_id": "5b7c3f3f3579-m-0",
+      "logical_task_id": "5b7c3f3f3579-m-0",
+      "task_type": "MAP",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "start_time": 1781637823.4141614,
+      "end_time": 1781637823.41533,
+      "duration": 0.0011684894561767578,
+      "output_path": "./output\\5b7c3f3f3579\\map-outputs\\5b7c3f3f3579-m-0\\part-0.pickle",
+      "input_split": {
+        "split_id": "split-0",
+        "start_idx": 0,
+        "length": 8,
+        "num_records": 8
+      },
+      "partition_id": null
+    }
+  ],
+  "reduce_tasks": [
+    {
+      "task_id": "5b7c3f3f3579-r-0",
+      "logical_task_id": "5b7c3f3f3579-r-0",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-0",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "start_time": 1781637823.5157492,
+      "end_time": 1781637823.5172946,
+      "duration": 0.0015454292297363281,
+      "output_path": "./output\\5b7c3f3f3579\\reduce-outputs\\5b7c3f3f3579-r-0.pickle",
+      "input_split": null,
+      "partition_id": 0
+    },
+    {
+      "task_id": "5b7c3f3f3579-r-1",
+      "logical_task_id": "5b7c3f3f3579-r-1",
+      "task_type": "REDUCE",
+      "state": "COMPLETED",
+      "worker_id": "worker-1",
+      "attempt": 1,
+      "is_speculative": false,
+      "result_accepted": true,
+      "start_time": 1781637823.515995,
+      "end_time": 1781637823.5171242,
+      "duration": 0.001129150390625,
+      "output_path": "./output\\5b7c3f3f3579\\reduce-outputs\\5b7c3f3f3579-r-1.pickle",
+      "input_split": null,
+      "partition_id": 1
+    }
+  ],
+  "summary": {
+    "total_map_tasks": 1,
+    "total_reduce_tasks": 2,
+    "accepted_map_results": 1,
+    "accepted_reduce_results": 2,
+    "failed_attempts": 0,
+    "speculative_attempts": 0
+  }
+}

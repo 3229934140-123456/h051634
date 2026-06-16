@@ -12,7 +12,7 @@ class TaskScheduler:
         self.job_tracker = job_tracker
         self.workers = workers
         self.speculative_threshold = 2.0
-        self.speculative_check_interval = 5.0
+        self.speculative_check_interval = 2.0
         self.last_speculative_check = 0.0
 
     def assign_next_task(self, worker_id: str) -> Optional[Task]:
@@ -40,7 +40,11 @@ class TaskScheduler:
             if not job or job.state not in (JobState.PENDING, JobState.RUNNING):
                 continue
 
-            pending_maps = [t for t in job.map_tasks if t.state == TaskState.PENDING]
+            pending_maps = [
+                t for t in job.map_tasks
+                if t.state == TaskState.PENDING
+                and t.logical_task_id not in job.accepted_logical_tasks
+            ]
             if pending_maps:
                 task = pending_maps[0]
                 self._assign_task(task, worker)
@@ -64,7 +68,11 @@ class TaskScheduler:
             if not job.all_maps_completed():
                 continue
 
-            pending_reduces = [t for t in job.reduce_tasks if t.state == TaskState.PENDING]
+            pending_reduces = [
+                t for t in job.reduce_tasks
+                if t.state == TaskState.PENDING
+                and t.logical_task_id not in job.accepted_logical_tasks
+            ]
             if pending_reduces:
                 task = pending_reduces[0]
                 self._assign_task(task, worker)
@@ -99,12 +107,15 @@ class TaskScheduler:
             worker.available = len(worker.running_tasks) < (worker.num_map_slots + worker.num_reduce_slots)
 
         job = self.job_tracker.get_job(job_id)
-        if job:
+        if not job:
+            return True
+
+        if job.accept_task_result(task):
             if task.task_type == TaskType.MAP:
-                if task.partition_id is not None:
-                    if task.worker_id not in job.map_outputs:
-                        job.map_outputs[task.worker_id] = []
-                    job.map_outputs[task.worker_id].append(output_path)
+                if task.worker_id not in job.map_outputs:
+                    job.map_outputs[task.worker_id] = []
+                task_dir = os.path.dirname(output_path)
+                job.map_outputs[task.worker_id].append(task_dir)
 
             if job.all_maps_completed() and job.state == JobState.RUNNING:
                 self.job_tracker.update_job_state(job_id, JobState.MAP_COMPLETED)
@@ -112,6 +123,8 @@ class TaskScheduler:
             if job.all_reduces_completed():
                 self.job_tracker.update_job_state(job_id, JobState.REDUCE_COMPLETED)
                 self.job_tracker.update_job_state(job_id, JobState.SUCCEEDED)
+        else:
+            pass
 
         return True
 
@@ -127,6 +140,13 @@ class TaskScheduler:
             worker.running_tasks.remove(task_id)
             worker.available = len(worker.running_tasks) < (worker.num_map_slots + worker.num_reduce_slots)
 
+        job = self.job_tracker.get_job(job_id)
+        if not job:
+            return True
+
+        if job.is_logical_task_completed(task.logical_task_id):
+            return True
+
         if task.attempt < 4:
             task.state = TaskState.PENDING
             task.worker_id = None
@@ -134,8 +154,12 @@ class TaskScheduler:
             task.end_time = None
             task.is_speculative = False
         else:
-            job = self.job_tracker.get_job(job_id)
-            if job:
+            has_other_attempts = any(
+                t.logical_task_id == task.logical_task_id
+                and t.state != TaskState.FAILED
+                for t in (job.map_tasks + job.reduce_tasks)
+            )
+            if not has_other_attempts:
                 self.job_tracker.update_job_state(job_id, JobState.FAILED)
 
         return True
@@ -155,13 +179,18 @@ class TaskScheduler:
             self._check_speculative_for_tasks(job, job.reduce_tasks)
 
     def _check_speculative_for_tasks(self, job: Job, tasks: List[Task]):
-        completed = [t for t in tasks if t.state == TaskState.COMPLETED and not t.is_speculative]
-        if len(completed) < max(1, len(tasks) // 2):
+        completed_accepted = [t for t in tasks if t.result_accepted]
+        if len(completed_accepted) < max(1, len(set(t.logical_task_id for t in tasks)) // 2):
             return
 
-        avg_duration = sum(t.duration for t in completed) / len(completed)
+        avg_duration = sum(t.duration for t in completed_accepted) / len(completed_accepted)
 
-        running = [t for t in tasks if t.state == TaskState.RUNNING and not t.is_speculative]
+        running = [
+            t for t in tasks
+            if t.state == TaskState.RUNNING
+            and not t.is_speculative
+            and not job.is_logical_task_completed(t.logical_task_id)
+        ]
         for task in running:
             if task.start_time and (time.time() - task.start_time) > avg_duration * self.speculative_threshold:
                 if task.attempt < 3:
@@ -169,14 +198,18 @@ class TaskScheduler:
 
     def _launch_speculative_copy(self, job: Job, original_task: Task):
         for t in (job.map_tasks + job.reduce_tasks):
-            if t.task_id == original_task.task_id and t.is_speculative:
+            if (t.logical_task_id == original_task.logical_task_id
+                    and t.is_speculative
+                    and t.state in (TaskState.PENDING, TaskState.ASSIGNED, TaskState.RUNNING)):
                 return
 
-        spec_task_id = f"{original_task.task_id}-spec-{generate_id()[:4]}"
+        spec_suffix = generate_id()[:4]
+        spec_task_id = f"{original_task.logical_task_id}-spec-{spec_suffix}"
         spec_task = Task(
             task_id=spec_task_id,
             task_type=original_task.task_type,
             job_id=original_task.job_id,
+            logical_task_id=original_task.logical_task_id,
             state=TaskState.PENDING,
             attempt=original_task.attempt + 1,
             input_split=original_task.input_split,
@@ -212,16 +245,14 @@ class TaskScheduler:
             if worker_id in job.map_outputs:
                 del job.map_outputs[worker_id]
                 for map_task in job.map_tasks:
-                    if map_task.worker_id == worker_id and map_task.state == TaskState.COMPLETED:
-                        map_task.state = TaskState.PENDING
-                        map_task.worker_id = None
-                        map_task.output_path = None
-                        map_task.start_time = None
-                        map_task.end_time = None
-
-                if job.state in (JobState.MAP_COMPLETED, JobState.REDUCE_COMPLETED):
-                    if not job.all_maps_completed():
-                        self.job_tracker.update_job_state(job_id, JobState.RUNNING)
+                    if (map_task.worker_id == worker_id
+                            and map_task.result_accepted
+                            and not job.is_logical_task_completed(map_task.logical_task_id)):
+                        pass
+                    elif (map_task.worker_id == worker_id
+                          and map_task.state == TaskState.COMPLETED
+                          and not map_task.result_accepted):
+                        pass
 
     def check_slow_workers(self) -> List[str]:
         slow_workers = []
@@ -229,3 +260,6 @@ class TaskScheduler:
             if not worker.is_alive:
                 slow_workers.append(worker_id)
         return slow_workers
+
+
+import os

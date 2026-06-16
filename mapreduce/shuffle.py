@@ -1,6 +1,7 @@
 import os
 import pickle
 import hashlib
+import json
 from typing import List, Dict, Any, Tuple
 from collections import defaultdict
 
@@ -114,6 +115,76 @@ def group_by_key(sorted_data: List[Tuple[Any, Any]]) -> List[Tuple[Any, List[Any
     return grouped
 
 
+def write_final_output(
+    results: List[Tuple[Any, Any]],
+    output_path: str,
+    output_format: str = "text"
+) -> str:
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    if output_format == "jsonl":
+        with open(output_path, "w", encoding="utf-8") as f:
+            for key, value in results:
+                line = json.dumps({"key": key, "value": value}, ensure_ascii=False)
+                f.write(line + "\n")
+    else:
+        with open(output_path, "w", encoding="utf-8") as f:
+            for key, value in results:
+                f.write(f"{key}\t{value}\n")
+
+    return output_path
+
+
+def read_input_files(
+    input_dir: str,
+    split_by: str = "lines",
+    chunk_size: int = 100
+) -> List[Any]:
+    """
+    从目录读取输入文件，切分成数据项列表
+    split_by: "lines" 按行切分, "size" 按大小切分, "files" 按文件切分
+    chunk_size: 每个分片的行数或字节数
+    """
+    all_data = []
+
+    if not os.path.isdir(input_dir):
+        if os.path.isfile(input_dir):
+            files = [input_dir]
+        else:
+            raise ValueError(f"输入路径不存在: {input_dir}")
+    else:
+        files = []
+        for f in sorted(os.listdir(input_dir)):
+            fp = os.path.join(input_dir, f)
+            if os.path.isfile(fp):
+                files.append(fp)
+
+    for file_path in files:
+        if split_by == "files":
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                all_data.append((os.path.basename(file_path), content))
+        elif split_by == "size":
+            with open(file_path, "rb") as f:
+                while True:
+                    chunk = f.read(chunk_size)
+                    if not chunk:
+                        break
+                    try:
+                        text = chunk.decode("utf-8", errors="replace")
+                        all_data.append(text)
+                    except Exception:
+                        all_data.append(str(chunk))
+        else:
+            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    line = line.rstrip("\n")
+                    if line:
+                        all_data.append(line)
+
+    return all_data
+
+
 class ShuffleManager:
     def __init__(self, base_output_dir: str):
         self.base_output_dir = base_output_dir
@@ -165,11 +236,33 @@ class ShuffleManager:
 
     def get_final_results(self, job_id: str, num_reduce_tasks: int) -> List[Tuple[Any, Any]]:
         all_results = []
-        for i in range(num_reduce_tasks):
-            task_id = f"{job_id}-r-{i}"
-            try:
-                results = self.read_reduce_output(job_id, task_id)
-                all_results.extend(results)
-            except Exception:
-                pass
+        seen_logical_ids = set()
+
+        from .job import JobTracker
+        job_output_dir = os.path.join(self.base_output_dir, job_id)
+        reduce_dir = os.path.join(job_output_dir, "reduce-outputs")
+
+        if os.path.exists(reduce_dir):
+            for f in sorted(os.listdir(reduce_dir)):
+                if f.endswith(".pickle"):
+                    task_id = f[:-7]
+                    logical_id = task_id.split("-spec-")[0]
+                    if logical_id not in seen_logical_ids:
+                        seen_logical_ids.add(logical_id)
+                        try:
+                            with open(os.path.join(reduce_dir, f), "rb") as fp:
+                                results = pickle.load(fp)
+                                all_results.extend(results)
+                        except Exception:
+                            pass
+
         return sorted(all_results, key=lambda x: str(x[0]))
+
+    def write_final_results(
+        self,
+        job_id: str,
+        results: List[Tuple[Any, Any]],
+        output_format: str = "text"
+    ) -> str:
+        output_path = os.path.join(self.base_output_dir, job_id, f"result.{output_format}")
+        return write_final_output(results, output_path, output_format)

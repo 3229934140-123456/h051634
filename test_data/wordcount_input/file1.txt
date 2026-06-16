@@ -1,0 +1,4 @@
+Hello world hello mapreduce
+MapReduce is a distributed programming model
+Hello distributed computing world
+Programming model for big data

@@ -32,6 +32,7 @@ class Task:
     task_id: str
     task_type: TaskType
     job_id: str
+    logical_task_id: str
     state: TaskState = TaskState.PENDING
     worker_id: Optional[str] = None
     attempt: int = 0
@@ -41,6 +42,7 @@ class Task:
     partition_id: Optional[int] = None
     output_path: Optional[str] = None
     is_speculative: bool = False
+    result_accepted: bool = False
 
     def mark_running(self, worker_id: str):
         self.state = TaskState.RUNNING
